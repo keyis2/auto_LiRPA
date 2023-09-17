@@ -16,3 +16,4 @@ verifier_log_*
 .idea
 *.so
 release
+.DS_Store
