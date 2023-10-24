@@ -57,7 +57,7 @@ with open(os.path.join(os.path.dirname(__file__), 'data/dataset.pkl'), 'rb') as 
 dataset = [(torch.tensor(data[0]), torch.tensor(data[1])) for data in dataset]
 
 # For illustration we only use N time step from dataset
-N=2
+N=1
 input_data = torch.cat([data[0] for data in dataset[:N]], dim=0).view(N,4)
 next_state = torch.cat([data[1] for data in dataset[:N]], dim=0).view(N,2)
 
@@ -74,15 +74,13 @@ ptb = PerturbationLpNorm(norm = norm, eps = eps)
 input_data = BoundedTensor(input_data, ptb)
 # Get model prediction as usual
 pred = lirpa_model(input_data)
-
+lirpa_model.eval()
 
 ## Step 5: Compute bounds for final output
 for method in [
         'IBP', 'IBP+backward (CROWN-IBP)', 'backward (CROWN)',
         'CROWN-Optimized (alpha-CROWN)']:
     print('Bounding method:', method)
-    if method != 'IBP':
-        continue
     if 'Optimized' in method:
         # For optimized bound, you can change the number of iterations, learning rate, etc here. Also you can increase verbosity to see per-iteration loss values.
         lirpa_model.set_bound_opts({'optimize_bound_args': {'iteration': 20, 'lr_alpha': 0.1}})
